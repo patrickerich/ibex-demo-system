@@ -161,12 +161,20 @@ set_property -dict { PACKAGE_PIN A9    IOSTANDARD LVCMOS33 } [get_ports { UART_R
 #set_property -dict { PACKAGE_PIN A3    IOSTANDARD LVCMOS33 } [get_ports { vaux14_n }]; #IO_L8N_T1_AD14N_35 Sch=ad_n[14] ChipKit pin=A11
 ## ChipKit Inner Analog Header - as Digital I/O
 ## NOTE: The following constraints should be used when using the inner analog header ports as digital I/O.
-set_property -dict { PACKAGE_PIN B7    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[0] }]; #IO_L2P_T0_AD12P_35 Sch=ad_p[12]
-set_property -dict { PACKAGE_PIN B6    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[1] }]; #IO_L2N_T0_AD12N_35 Sch=ad_n[12]
-set_property -dict { PACKAGE_PIN E6    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[2] }]; #IO_L5P_T0_AD13P_35 Sch=ad_p[13]
-set_property -dict { PACKAGE_PIN E5    IOSTANDARD LVCMOS33 } [get_ports { SPI_TX }]; #IO_L5N_T0_AD13N_35 Sch=ad_n[13]
-set_property -dict { PACKAGE_PIN A4    IOSTANDARD LVCMOS33 } [get_ports { SPI_SCK }]; #IO_L8P_T1_AD14P_35 Sch=ad_p[14]
-set_property -dict { PACKAGE_PIN A3    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[3] }]; #IO_L8N_T1_AD14N_35 Sch=ad_n[14]
+set_property -dict { PACKAGE_PIN B7    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[0] }]; #IO_L2P_T0_AD12P_35 Sch=ad_p[12] Chipkit pin=A6
+set_property -dict { PACKAGE_PIN B6    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[1] }]; #IO_L2N_T0_AD12N_35 Sch=ad_n[12] Chipkit pin=A7
+set_property -dict { PACKAGE_PIN E6    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[2] }]; #IO_L5P_T0_AD13P_35 Sch=ad_p[13] Chipkit pin=A8
+set_property -dict { PACKAGE_PIN E5    IOSTANDARD LVCMOS33 } [get_ports { SPI_TX }]; #IO_L5N_T0_AD13N_35 Sch=ad_n[13]       Chipkit pin=A9
+set_property -dict { PACKAGE_PIN A4    IOSTANDARD LVCMOS33 } [get_ports { SPI_SCK }]; #IO_L8P_T1_AD14P_35 Sch=ad_p[14]      Chipkit pin=A10
+set_property -dict { PACKAGE_PIN A3    IOSTANDARD LVCMOS33 } [get_ports { DISP_CTRL[3] }]; #IO_L8N_T1_AD14N_35 Sch=ad_n[14] Chipkit pin=A11
+# SOme additional Pin information wrt AZ-Delivery LCD board
+# DISP_CTRL[0]     CS       BOARD PIN pin=A6 
+# DISP_CTRL[1]     RESET    BOARD PIN pin=A7 
+# DISP_CTRL[2]     A0       BOARD PIN pin=A8 
+# SPI_TX           SDA      BOARD PIN pin=A9 
+# SPI_SCK          SCK      BOARD PIN pin=A10
+# DISP_CTRL[3]     LED      BOARD PIN pin=A11
+# Connect VCC  to 3V3 and GND to GND
 
 ## ChipKit SPI
 #set_property -dict { PACKAGE_PIN G1    IOSTANDARD LVCMOS33 } [get_ports { SPI_RX }]; #IO_L17N_T2_35 Sch=ck_miso
