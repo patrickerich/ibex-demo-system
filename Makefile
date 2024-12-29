@@ -1,99 +1,67 @@
+THIS_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 ARTY35 := xc7a35ticsg324-1L
 ARTY100 := xc7a100tcsg324-1
 FPGA ?= $(ARTY100)
 DEVICE ?= /dev/ttyUSB1
 BAUDRATE ?= 115200
 
-# HWPROG := cmdint
-# HWPROG := blank
-# HWPROGFILE = $(PWD)/sw/c/build/$(HWPROG)/$(HWPROG)
-HWPROGFILE = $(PWD)/sw/c/build/demo/hello_world/demo
+SWCDIR   := $(THIS_DIR)/sw/c
+SWRDIR   := $(THIS_DIR)/sw/rust 
+SWCBUILD := $(SWCDIR)/build
+HWPROG   ?= $(SWCBUILD)/demo/hello_world/demo
 
-# SIMPROG := cmdint
-# # SIMPROG := demo
-# # SIMPROG := demo_uart
-# SIMPROGFILE := $(PWD)/sw/build/$(SIMPROG)/$(SIMPROG).vmem
+HWBUILD  := $(THIS_DIR)/build/lowrisc_ibex_demo_system_0/synth-vivado
+
+.PHONY: clean-sw-c
+clean-sw-c:
+	-rm -rf $(SWCBUILD)
+
+.PHONY: build-sw-c
+build-sw-c: clean-sw-c
+	mkdir -p $(SWCBUILD)
+	(cd $(SWCBUILD) && cmake .. && make)
+
+.PHONY: clean-sw-rust
+clean-sw-rust:
+	(cd $(SWRDIR) && cargo clean)
+
+.PHONY: build-sw-rust
+build-sw-rust: clean-sw-rust
+	(cd $(SWRDIR) && cargo build --bin led)
 
 .PHONY: build-hw
 build-hw:
 	fusesoc --cores-root=. run --target=synth --setup --build \
 		lowrisc:ibex:demo_system --part $(FPGA) \
-		--SRAMInitFile=$(HWPROGFILE)
+		--SRAMInitFile=$(HWPROG)
 
-.PHONY: build-sw-c
-build-sw-c:
-	rm -rf sw/c/build 
-	mkdir sw/c/build
-	pushd sw/c/build
-	cmake ..
-	$(MAKE)
-	popd
-
-.PHONY: build-sw-rust
-build-sw-rust:
-	cargo clean
-	pushd sw/rust
-	cargo build --bin led
-	popd
+.PHONY: clean-hw
+clean-hw:
+	-rm -rf $(HWBUILD)
 
 .PHONY: program-hw
 program-hw:
-	# fusesoc --cores-root=. run --target=synth --run \
-	# 	lowrisc:ibex:demo_system 
-	$(MAKE) -C $(PWD)/build/lowrisc_ibex_demo_system_0/synth-vivado/ pgm
+	$(MAKE) -C $(THIS_DIR)/build/lowrisc_ibex_demo_system_0/synth-vivado/ pgm
 
 .PHONY: start-vivado
 start-vivado:
-	make -C $(PWD)/build/lowrisc_ibex_demo_system_0/synth-vivado/ build-gui &
+	make -C $(THIS_DIR)/build/lowrisc_ibex_demo_system_0/synth-vivado/ build-gui &
 
-# .PHONY: load-demo-run
-# load-demo-run:
-# 	./util/load_demo_system.sh run $(HWPROGFILE)
+.PHONY: load-demo-run
+load-demo-run:
+	$(THIS_DIR)/util/load_demo_system.sh run $(THIS_DIR)/sw/c/build/demo/hello_world/demo
 
-# .PHONY: run-cmdint
-# run-cmdint:
-# 	python sw/cmdint/cmdint.py
+.PHONY: clean-sim
+clean-sim:
+	-rm -f *.fst *.vcd
 
-# .PHONY: setup-sims
-# setup-sims:
-# 	fusesoc --cores-root=. run --target=sim --setup \
-# 		lowrisc:ibex:demo_system   \
-# 		--SRAMInitFile=$(SIMPROGFILE)
-# # SRAMInitFile can be modified/overridden in the simulation setup
+.PHONY: clean-all
+clean-all:
+	$(MAKE) clean-sw-c
+	$(MAKE) clean-sw-rust
+	$(MAKE) clean-hw
+	$(MAKE) clean-sim
+	-rm -rf $(THIS_DIR)/build
 
-# .PHONY: run-sims
-# run-sims: build-sw setup-sims
-# 	(cd sim && mkdir -p sim_reports && \
-# 	SIM=verilator pytest \
-# 	   -n 1 \
-# 	   -o cache_dir=.pytest_cache \
-# 	   -o python_files="pytest_*.py" \
-# 	   --html=sim_reports/sim_report_$$(date +%Y%m%d%H%M%S).html \
-# 	)
-# # Running multiple parallel simulations with different SRAM files seems to cause some problems?
 
-# .PHONY: view-wave
-# view-wave:
-# 	gtkwave -f build/lowrisc_ibex_demo_system_0/sim-cocotb/dump.fst \
-# 	        -a sim/sim.wav &
-
-# .PHONY: clean-sw
-# clean-sw:
-# 	-rm -rf sw/build
-
-# .PHONY: clean-hw
-# clean-hw:
-# 	-rm -rf build/lowrisc_ibex_demo_system_0/synth-vivado
-
-# .PHONY: clean-sim
-# clean-sim:
-# 	-rm -rf build/lowrisc_ibex_demo_system_0/sim-*
-# 	-rm -rf sim/__pycache__ sim/.pytest_cache
-
-# .PHONY: clean-sim-results
-# clean-sim-results:
-# 	-rm -rf sim/sim_reports
-
-# .PHONY: clean-all
-# clean-all: clean-sw clean-hw clean-sim clean-sim-results
-# 	-rm -rf build
