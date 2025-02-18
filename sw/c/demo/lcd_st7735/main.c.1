@@ -9,7 +9,6 @@
 #include "lcd.h"
 // #include "lowrisc_logo.h"
 #include "hny_logo.h"
-#include "fireworks_frames.h"
 #include "spi.h"
 #include "st7735/lcd_st7735.h"
 #include "timer.h"
@@ -36,11 +35,10 @@ typedef enum {
 } Buttons_t;
 
 // Local functions declaration.
-static void happy_new_year(St7735Context *lcd);
 static uint32_t spi_write(void *handle, uint8_t *data, size_t len);
 static uint32_t gpio_write(void *handle, bool cs, bool dc);
 static void timer_delay(uint32_t ms);
-// static void fractal_test(St7735Context *lcd);
+static void fractal_test(St7735Context *lcd);
 static Buttons_t scan_buttons(uint32_t timeout, Buttons_t def);
 
 int main(void) {
@@ -73,40 +71,58 @@ int main(void) {
   // Set the LCD orientation.
   lcd_st7735_set_orientation(&lcd, LCD_Rotate180);
 
-  // // Setup text font bitmaps to be used and the colors.
-  // lcd_st7735_set_font(&lcd, &lucidaConsole_10ptFont);
-  // lcd_st7735_set_font_colors(&lcd, BGRColorWhite, BGRColorBlack);
+  // Setup text font bitmaps to be used and the colors.
+  lcd_st7735_set_font(&lcd, &lucidaConsole_10ptFont);
+  lcd_st7735_set_font_colors(&lcd, BGRColorWhite, BGRColorBlack);
 
-  happy_new_year(&lcd);
+  // Clean display with a white rectangle.
+  lcd_st7735_clean(&lcd);
 
+  // Draw the splash screen with a RGB 565 bitmap and text in the bottom.
+  // lcd_st7735_draw_rgb565(&lcd, (LCD_rectangle){.origin = {.x = (160 - 105) / 2, .y = 5}, .width = 105, .height = 80},
+  //                        (uint8_t *)hny_logo_105x80);
+  lcd_st7735_draw_rgb565(&lcd, (LCD_rectangle){.origin = {.x = 0, .y = 0}, .width = 160, .height = 128},
+                         (uint8_t *)hny_logo_160x128);                         
+  // lcd_println(&lcd, "Booting...", alined_center, 7);
+  timer_delay(10000);
 
-  do {
-    switch (scan_buttons(3000, BTN2)) {
-      case BTN0:
-        happy_new_year(&lcd);
-        break;
-      case BTN1:
-        lcd_st7735_clean(&lcd);
-        break;
-      case BTN2:
-        break;
-      case BTN3:
-        break;
-      default:
-        break;
-    }
-  } while (1);
-}
+  // do {
+  //   lcd_st7735_clean(&lcd);
 
-static void happy_new_year(St7735Context *lcd) {
-  lcd_st7735_clean(lcd);
-  asm volatile("fence rw, rw");
-  for (int i=0; i<10; i++) {
-    lcd_st7735_draw_rgb565(lcd, (LCD_rectangle){.origin = {.x = 0, .y = 0}, .width = 160, .height = 128}, (uint8_t *)fireworks_frames[i]);
-    timer_delay(150);
-  }
-  asm volatile("fence rw, rw");
-  lcd_st7735_draw_rgb565(lcd, (LCD_rectangle){.origin = {.x = 0, .y = 0}, .width = 160, .height = 128}, (uint8_t *)hny_logo_160x128); 
+  //   // Show the main menu.
+  //   const char *items[] = {
+  //       "0. Fractal",
+  //       "1. Custom",
+  //   };
+  //   Menu_t main_menu = {
+  //       .title          = "Main menu",
+  //       .color          = BGRColorBlue,
+  //       .selected_color = BGRColorRed,
+  //       .background     = BGRColorWhite,
+  //       .items_count    = sizeof(items) / sizeof(items[0]),
+  //       .items          = items,
+  //   };
+  //   lcd_show_menu(&lcd, &main_menu);
+  //   lcd_st7735_puts(&lcd, (LCD_Point){.x = 5, .y = 106}, "Defaulting to item");
+  //   lcd_st7735_puts(&lcd, (LCD_Point){.x = 5, .y = 118}, "0 after 3 seconds");
+
+  //   switch (scan_buttons(3000, BTN0)) {
+  //     case BTN0:
+  //       // Run the fractal examples.
+  //       fractal_test(&lcd);
+  //       break;
+  //     case BTN1:
+  //       lcd_st7735_puts(&lcd, (LCD_Point){.x = 5, .y = 80}, "Button 1 pressed");
+  //       timer_delay(1000);
+  //       break;
+  //     case BTN2:
+  //       break;
+  //     case BTN3:
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // } while (1);
 }
 
 static Buttons_t scan_buttons(uint32_t timeout, Buttons_t def) {
@@ -131,12 +147,12 @@ static Buttons_t scan_buttons(uint32_t timeout, Buttons_t def) {
   } while (1);
 }
 
-// static void fractal_test(St7735Context *lcd) {
-//   fractal_mandelbrot_float(lcd);
-//   timer_delay(5000);
-//   fractal_mandelbrot_fixed(lcd);
-//   timer_delay(5000);
-// }
+static void fractal_test(St7735Context *lcd) {
+  fractal_mandelbrot_float(lcd);
+  timer_delay(5000);
+  fractal_mandelbrot_fixed(lcd);
+  timer_delay(5000);
+}
 
 static uint32_t spi_write(void *handle, uint8_t *data, size_t len) {
   const uint32_t data_sent = len;
