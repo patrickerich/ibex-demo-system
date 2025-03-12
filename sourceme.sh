@@ -9,6 +9,10 @@ VENV_REQS=${THIS_DIR}/${PYREQS_FILE}
 VENV_NAME=$(basename ${THIS_DIR})
 export VENV_ACT=${VENV_DIR}/bin/activate
 
+# Use more recent gcc version for compiling (verilator) testbench
+source /opt/rh/gcc-toolset-13/enable
+
+
 # ########################
 # ## Helper functions   ##
 # ########################
