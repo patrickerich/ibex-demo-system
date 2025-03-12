@@ -6,9 +6,10 @@ OUTPUT_ARCH(riscv)
 
 MEMORY
 {
-    /* 124 KiB should be enough for anybody... */
-    ram         : ORIGIN = 0x00100000, LENGTH = 0x1E000 /* 124 KiB */
-    stack       : ORIGIN = 0x0011E000, LENGTH = 0x02000 /*   4 KiB */
+    /* 60 KiB should be enough for anybody... */
+    /* Increase RAM size by 7 * 64 KiB */
+     ram         : ORIGIN = 0x00100000, LENGTH = 0x7E000 /* 504 KiB */
+     stack       : ORIGIN = 0x0017E000, LENGTH = 0x2000  /* 8 KiB */
 }
 
 /* Stack information variables */
