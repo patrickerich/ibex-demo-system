@@ -1,9 +1,8 @@
-#include <sys/times.h>
 #include "dhry.h"
 #include "demo_system.h"
 #include "timer.h"
 
-/* Safe memory allocator */
+/* Simple memory allocator */
 void *malloc(size_t size) {
     static unsigned char memory[16384] __attribute__((aligned(8)));
     static size_t next = 0;
@@ -21,35 +20,48 @@ void *malloc(size_t size) {
     return result;
 }
 
-/* Timer function for Dhrystone */
 clock_t times(struct tms *buffer) {
-    uint64_t cycles = get_elapsed_time();
+    unsigned long cycles;
+    unsigned long insns;
+    asm volatile ("rdcycle %0" : "=r" (cycles));
+    asm volatile ("rdinstret %0" : "=r" (insns));
     if (buffer) {
         buffer->tms_utime = cycles;
-        buffer->tms_stime = 0;
+        buffer->tms_stime = insns;
         buffer->tms_cutime = 0;
         buffer->tms_cstime = 0;
     }
     return cycles;
 }
 
-/* Fixed number of iterations */
-int scanf(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    int *n = va_arg(args, int*);
-    *n = 5000; // Set appropriate value for Ibex
-    va_end(args);
-    return 1;
+void putdec(unsigned int val) {
+    char buffer[12];
+    int i = 0;
+    
+    if (val == 0) {
+        putchar('0');
+        return;
+    }
+    
+    while (val > 0) {
+        buffer[i++] = '0' + (val % 10);
+        val /= 10;
+    }
+    
+    while (i > 0) {
+        putchar(buffer[--i]);
+    }
 }
 
-// uint64_t get_cycle_count(void) {
-//     uint64_t cycles;
-//     asm volatile ("rdcycle %0" : "=r" (cycles));
-//     return cycles;
-// }
-
-uint64_t get_cycle_count(void) {
-    // Using standard timer instead of cycle counter
-    return (uint64_t)get_elapsed_time();
+// Print float with 3 decimal places
+void print_float3(float val) {
+    int whole = (int)val;
+    int frac = (int)((val - whole) * 1000 + 0.5);
+    if (frac < 0) frac = -frac;
+    
+    putdec(whole);
+    putchar('.');
+    if (frac < 100) putchar('0');
+    if (frac < 10) putchar('0');
+    putdec(frac);
 }

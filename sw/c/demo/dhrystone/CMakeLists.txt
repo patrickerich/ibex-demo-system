@@ -1,30 +1,47 @@
-# # Minimal Dhrystone-like benchmark
-# add_executable(dhrystone
-#   dhry_minimal.c
+# CMakeLists.txt for Dhrystone2 benchmark
+
+cmake_minimum_required(VERSION 3.10)
+project(dhrystone C)
+
+# Set C standard
+set(CMAKE_C_STANDARD 11)
+
+# Add include directories
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/sw/c/common
+)
+
+# Source files for the benchmark
+set(SOURCES
+    dhry_1.c
+    dhry_2.c
+    dhry_utils.c
+)
+
+# Link to the common library path
+link_directories(${CMAKE_BINARY_DIR}/sw/c/common)
+
+# Create the executable
+add_executable(dhrystone2 ${SOURCES})
+
+# Link with the common library which contains demo_system, timer, etc.
+target_link_libraries(dhrystone2 common)
+
+# Compiler flags
+# Optimization flags - you might want to adjust these
+target_compile_options(dhrystone2 PRIVATE
+    -O2                  # Optimization level
+    -march=rv32imc       # RISC-V architecture spec
+    -mabi=ilp32          # ABI type
+    -fno-builtin         # Don't use built-in functions
+    -fno-common          # Don't place uninitialized globals in common block
+    -Wall                # Enable warnings
+    -g                   # Include debug info
+)
+
+# Copy the binary to the output directory if needed
+# (Uncomment and modify if you have a specific output directory)
+# add_custom_command(TARGET dhrystone2 POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:dhrystone2> ${OUTPUT_DIR}
 # )
-
-# target_link_libraries(dhrystone common)
-
-# Full Dhrystone benchmark
-add_executable(dhrystone
-  dhry_main.c
-  dhry_1.c
-  dhry_2.c
-  dhry_utils.c
-)
-
-target_link_libraries(dhrystone common)
-
-# Define configuration flags
-target_compile_definitions(dhrystone PRIVATE
-  -DNOSTRUCTASSIGN      # Use safer structure assignment
-  -DTIMER_ENABLED=50000 # Timer frequency
-)
-
-# Optimization flags
-target_compile_options(dhrystone PRIVATE
-  -O2                   # Optimize for performance
-  -falign-functions=4   # Ensure proper alignment
-  -falign-jumps=4
-  -falign-loops=4
-)
