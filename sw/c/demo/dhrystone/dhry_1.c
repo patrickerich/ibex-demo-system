@@ -58,7 +58,7 @@ int main() {
         puts("\n");
  
         /* Set a fixed number of runs - modify as needed */
-        Number_Of_Runs = 50000;
+        Number_Of_Runs = 10000;
         
         puts("Executing ");
         putdec(Number_Of_Runs);
