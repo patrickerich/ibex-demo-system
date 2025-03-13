@@ -351,6 +351,9 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "timer.h"
+#include "demo_system.h"
+
 #ifndef TIME
 #define TIMES
 #endif
@@ -438,7 +441,7 @@ void Proc_8(Arr_1_Dim Arr_1_Par_Ref, Arr_2_Dim Arr_2_Par_Ref, int Int_1_Par_Val,
 Enumeration     Func_1(Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
 Boolean Func_2(Str_30 Str_1_Par_Ref, Str_30 Str_2_Par_Ref);
 Boolean Func_3(Enumeration Enum_Par_Val);
-void print_float3(float val);
-void print_float1(float val);
 
-uint64_t get_cycle_count(void);
+void putdec(unsigned int val);
+void print_float3(float val);
+

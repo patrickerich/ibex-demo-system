@@ -19,8 +19,6 @@
 
 #ifndef REG
 #define REG
-        /* REG becomes defined as empty */
-        /* i.e. no register variables   */
 #endif
 
 extern  int     Int_Glob;
