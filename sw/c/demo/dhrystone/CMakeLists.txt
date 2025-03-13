@@ -1,4 +1,4 @@
-# CMakeLists.txt for Dhrystone2 benchmark
+# CMakeLists.txt for Dhrystone benchmark
 
 cmake_minimum_required(VERSION 3.10)
 project(dhrystone C)
@@ -23,14 +23,14 @@ set(SOURCES
 link_directories(${CMAKE_BINARY_DIR}/sw/c/common)
 
 # Create the executable
-add_executable(dhrystone2 ${SOURCES})
+add_executable(dhrystone ${SOURCES})
 
 # Link with the common library which contains demo_system, timer, etc.
-target_link_libraries(dhrystone2 common)
+target_link_libraries(dhrystone common)
 
 # Compiler flags
 # Optimization flags - you might want to adjust these
-target_compile_options(dhrystone2 PRIVATE
+target_compile_options(dhrystone PRIVATE
     -O2                  # Optimization level
     -march=rv32imc       # RISC-V architecture spec
     -mabi=ilp32          # ABI type
@@ -42,6 +42,6 @@ target_compile_options(dhrystone2 PRIVATE
 
 # Copy the binary to the output directory if needed
 # (Uncomment and modify if you have a specific output directory)
-# add_custom_command(TARGET dhrystone2 POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:dhrystone2> ${OUTPUT_DIR}
+# add_custom_command(TARGET dhrystone POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:dhrystone> ${OUTPUT_DIR}
 # )
